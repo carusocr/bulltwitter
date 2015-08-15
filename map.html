@@ -19,77 +19,41 @@
         padding: 5px;
         border: 1px solid #999;
       }
+      /*  start styles for the ContextMenu  */
+      .context_menu{
+        background-color:white;
+        border:1px solid gray;
+      }
+      .context_menu_item{
+        padding:3px 6px;
+      }
+      .context_menu_item:hover{
+        background-color:#CCCCCC;
+      }
+      .context_menu_separator{
+        background-color:gray;
+        height:1px;
+        margin:0;
+        padding:0;
+      }
+      #clearDirectionsItem, #getDirectionsItem{
+        display:none;
+      }
+      /*  end styles for the ContextMenu  */
+
     </style>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+    <script type="text/javascript", src="ContextMenu.js"></script>
     <script>
 
-
-function markPoints() {
-  if (typeof heatmap === "object") {
-    heatmap.setMap(null);
-    heatmap = "undefined";
-  }
-  var fileInput = document.getElementById("fileInput");
-  var file = fileInput.files[0];
-  var reader = new FileReader();
-  var newpoints = [];
-  reader.onload = function(e) {
-    var pointlist = reader.result.split("\n");
-    var tot_lat = 0;
-    var tot_long = 0;
-    for (var i =0; i < (pointlist.length)-1; i++) {
-      var points = pointlist[i].split("\t");
-      var point = new google.maps.LatLng(parseFloat(points[0]),parseFloat(points[1]));
-      var tweet_load = "<p>" + points[2] + "<br />" + points[3] + "</p>";
-      newpoints.push(point);      
-      tot_lat = tot_lat + parseFloat(points[0]);
-      tot_long = tot_long + parseFloat(points[1]);
-      createMarker(parseFloat(points[0]),parseFloat(points[1]),tweet_load);
-    }
-    var pointArray = new google.maps.MVCArray(newpoints);
-    google.maps.event.trigger(map, 'resize');
-    var avg_lat = (tot_lat / pointlist.length);
-    var avg_long = (tot_long / pointlist.length);
-    moveToLocation(avg_lat, avg_long);
-  }
-  reader.readAsText(file);
-}
-
-//using this to create multiple markers
-function createMarker(lat, lon, html) {
-  var newmarker = new google.maps.Marker({
-    position: new google.maps.LatLng(lat, lon),
-    map: map,
-    title: html
-  });
-  markers.push(newmarker);
-  newmarker['infowindow'] = new google.maps.InfoWindow({
-    content: html
-  });
-  google.maps.event.addListener(newmarker, 'click', function() {
-    this['infowindow'].open(map, this);
-  });
-}
-
-function clearMarkers() {
-  for (var i = 0; i < markers.length; i++) {
-    markers[i].setMap(null);
-  }
-  markers.length = 0;
-}
-
-function moveToLocation(lat, lng){
-  var center = new google.maps.LatLng(lat, lng);
-  map.panTo(center);
-  map.setZoom(6);
-}
+var map;
 
 function initialize() {
-  var myLatLong = new google.maps.LatLng(6.488619,3.359756);
   var mapOptions = {
-    zoom: 2,
-    center: new google.maps.LatLng(10,612361,-2.360596),
-    mapTypeId: google.maps.MapTypeId.HYBRID,
+    zoom: 10,
+    //center: new google.maps.LatLng(10.612361,-2.360596),
+    center: new google.maps.LatLng(39.9522222,-75.1641667),
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
     mapTypeControl: true,
     mapTypeControlOptions: {
       style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
@@ -99,16 +63,37 @@ function initialize() {
 
   map = new google.maps.Map(document.getElementById('map-canvas'),
     mapOptions);
+
   ws = new WebSocket("ws://localhost:8567/");
-  ws.onmessage = function(evt) {
-    var points = evt.data.split("\t");
-    var point = new google.maps.LatLng(parseFloat(points[0]),parseFloat(points[1]));
-    var tweet_load = "<p>" + points[2] + "<br />" + points[3] + "</p>";
-    createMarker(parseFloat(points[0]),parseFloat(points[1]),tweet_load);
-  };
-  google.maps.event.addListener(map, 'rightclick', function( event ){
-    alert( "Latitude: "+event.latLng.lat()+" "+", longitude: "+event.latLng.lng() ); 
+
+// new context menu to enable right-click option to make tweet from that point
+
+  var contextMenuOptions={};
+  contextMenuOptions.classNames={menu:'context_menu', menuSeparator:'context_menu_separator'};
+  
+  //  create an array of ContextMenuItem objects
+  //  an 'id' is defined for each of the four directions related items
+  var menuItems=[];
+  menuItems.push({className:'context_menu_item', eventName:'bulltweet', id:'directionsOriginItem', label:'Tweet from here'});
+  contextMenuOptions.menuItems=menuItems;
+
+  var contextMenu=new ContextMenu(map, contextMenuOptions);
+  
+  google.maps.event.addListener(map, 'rightclick', function(mouseEvent){
+    contextMenu.show(mouseEvent.latLng);
   });
+  google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
+     switch(eventName){
+       case 'bulltweet':
+         alert('bulltweeting...');
+         bullTweet('ZUG');
+         break;
+     }
+  });
+}
+
+function bullTweet(msg) {
+  ws.send(msg);
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);

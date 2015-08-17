@@ -2,33 +2,9 @@
 =begin 
 
 Socket.rb will listen for the map page's creation of a websocket. Once it's 
-found it, it will then start listening for the tweetstream.rb script bunny message feed
-and send the tweet location and body to the map page. 
+found it, it will then start listening for events from the bulltwitter map and
+call the tweet script when a message is received.
 
-Things I wanna do:
-
-1. language specification on map page. This will send a message back to socket, which will
-route the command to tweetstream, which will stop current collection and restart with new 
-parameters.
-2. Geolocation. Ideally, it would work like this: Click on 'Draw collection box', then
-drag pointer to create a rectangle over a particular area of the world. The bounding box 
-coordinates would then be passed to socket.rb and then to tweetstream, which would
-report only on geotagged tweets within that area.
-3. Geo-independent collection. This would work like...hmm. If you've toggled 'from wherever' 
-it would still continue marking geotagged tweets on map, but non-geotagged would still be 
-saved to a file (along with the rest). A counter somewhere would list a running tally of
-tweets collected.
-4. Keyword search, would work in same manner as language spec in terms of interprocess
-communication.
-5. Cleaner handling of heatmaps, loading point from file.
-
-
-***TROUBLESHOOTING/BUG LIST
-
-1. map.html is closing websocket after sending keyword list.
-2. map.html doesn't clear contents of loaded files after "Reset Map".
-
-***
 =end
 
 require 'em-websocket'

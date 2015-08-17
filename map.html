@@ -84,15 +84,16 @@ function initialize() {
   google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
      switch(eventName){
        case 'bulltweet':
-         alert('bulltweeting...');
-         bullTweet('ZUG');
+         bullTweet(latLng,'testing bt');
          break;
      }
   });
 }
 
-function bullTweet(msg) {
-  ws.send(msg);
+function bullTweet(latLng,msg) {
+  msgbody = latLng + msg;
+  alert(msgbody);
+  ws.send(msgbody);
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);

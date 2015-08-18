@@ -82,17 +82,18 @@ function initialize() {
     contextMenu.show(mouseEvent.latLng);
   });
   google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
-     switch(eventName){
-       case 'bulltweet':
-         bullTweet(latLng,'testing bt');
-         break;
-     }
+  switch(eventName){
+    case 'bulltweet':
+      var msg = prompt("Enter your tweet status.");
+      bullTweet(latLng,msg);
+      break;
+    }
   });
 }
 
 function bullTweet(latLng,msg) {
   msgbody = latLng + msg;
-  alert(msgbody);
+  alert("Sending tweet...");
   ws.send(msgbody);
 }
 

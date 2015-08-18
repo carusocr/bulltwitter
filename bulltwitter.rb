@@ -34,15 +34,6 @@ EM.run {
   EM::WebSocket.run(:host => "127.0.0.1", :port => 8567) do |ws|
     ws.onopen do
       puts "WebSocket opened"
-      conn = Bunny.new
-      conn.start
-      ch = conn.create_channel
-      ch.queue("tweets").subscribe do |delivery_info, properties, body|
-        puts "Received tweet\n"
-        encoded_tweet=body.force_encoding("iso-8859-1").force_encoding("utf-8")
-        puts encoded_tweet
-        ws.send encoded_tweet
-      end
     end
     ws.onclose do
       ws.close(code = nil, body = nil)

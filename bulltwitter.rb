@@ -8,9 +8,7 @@ call the tweet script when a message is received.
 =end
 
 require 'em-websocket'
-require 'uuid'
 require 'bunny'
-require 'twitter'
 require 'yaml'
 require 'json'
 require 'oauth'

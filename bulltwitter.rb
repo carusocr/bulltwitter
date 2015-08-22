@@ -1,31 +1,35 @@
 #!/usr/bin/env ruby
 =begin 
 
-Socket.rb will listen for the map page's creation of a websocket. Once it's 
+BullTwitter will listen for the map page's creation of a websocket. Once it's 
 found it, it will then start listening for events from the bulltwitter map and
-call the tweet script when a message is received.
+call the tweet method when a message is received.
 
 =end
 
 require 'em-websocket'
-require 'bunny'
 require 'yaml'
 require 'json'
 require 'oauth'
+require 'twitter'
 
 cfgfile = 'auth.cfg'
 cnf = YAML::load(File.open(cfgfile))
-$con_key       = cnf['crcbot']['con_key']
-$con_sec    = cnf['crcbot']['con_sec']
-$access_token        = cnf['crcbot']['o_tok']
-$access_token_secret = cnf['crcbot']['o_tok_sec']
+#set up Twitter client
+$client = Twitter::REST::Client.new do |config|
+  config.consumer_key       = cnf['crcbot']['con_key']
+  config.consumer_secret    = cnf['crcbot']['con_sec']
+  config.access_token        = cnf['crcbot']['o_tok']
+  config.access_token_secret = cnf['crcbot']['o_tok_sec']
+end
 
 def bulltweet(lat,lng,status)
+  $client.update status, {lat: lat, long: lng}
+end
 
-  consumer = OAuth::Consumer.new($con_key,$con_sec, :site => "http://api.twitter.com", :scheme => :header)
-  access_token = OAuth::AccessToken.from_hash(consumer, :oauth_token => $access_token, :oauth_token_secret => $access_token_secret)
-  access_token.request(:post, "https://api.twitter.com/1.1/statuses/update.json", {"Content-Type" => "application/json", "status"=>"#{status}", "lat"=>lat, "long"=>lng})
-
+def bulltweet_with_image(lat,lng,status,imgfile)
+  media_id = $client.upload File.new imgfile
+  $client.update status, {lat: lat, long: lng, media_ids: media_id}
 end
 
 EM.run {
@@ -42,8 +46,8 @@ EM.run {
       # check for coords in parens + string
       if msg =~ /\(-?\d{1,3}\.\d+, -?\d{1,3}\.\d+\)/
         puts "got #{msg}\n"
-        lat,lng,tweet = msg.match(/\((-?\d{1,3}\.\d+), (-?\d{1,3}\.\d+)\)(.+)$/).captures
-        bulltweet(lat,lng,tweet)
+        lat,lng,status = msg.match(/\((-?\d{1,3}\.\d+), (-?\d{1,3}\.\d+)\)(.+)$/).captures
+        bulltweet(lat,lng,status)
       else
         puts "Got unintelligible command, please resend."
       end

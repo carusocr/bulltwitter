@@ -93,7 +93,6 @@ function initialize() {
 
 function bullTweet(latLng,msg) {
   msgbody = latLng + msg;
-  alert("Sending tweet...");
   ws.send(msgbody);
 }
 

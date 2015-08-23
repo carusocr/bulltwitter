@@ -74,6 +74,7 @@ function initialize() {
   //  an 'id' is defined for each of the four directions related items
   var menuItems=[];
   menuItems.push({className:'context_menu_item', eventName:'bulltweet', id:'directionsOriginItem', label:'Tweet from here'});
+  menuItems.push({className:'context_menu_item', eventName:'bulltweet_image', id:'directionsOriginItem', label:'Tweet+Image from here'});
   contextMenuOptions.menuItems=menuItems;
 
   var contextMenu=new ContextMenu(map, contextMenuOptions);
@@ -87,6 +88,11 @@ function initialize() {
       var msg = prompt("Enter your tweet status.");
       bullTweet(latLng,msg);
       break;
+    case 'bulltweet_image':
+      alertFilename();
+      //var msg = prompt("Enter your tweet status.");
+      //bullTweet(latLng,msg);
+      break;
     }
   });
 }
@@ -94,6 +100,11 @@ function initialize() {
 function bullTweet(latLng,msg) {
   msgbody = latLng + msg;
   ws.send(msgbody);
+}
+
+function alertFilename() {
+  var thefile = document.getElementById('thefile');
+  alert(thefile.value);
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
@@ -106,6 +117,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <div id="map-canvas"></div>
     <div id="panel">
     <button onclick="initialize()">Reset Map</button>
+    <input type="file" id="thefile" onchange="alertFilename()" />
     </div>
   </body>
 </div>

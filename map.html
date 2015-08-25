@@ -47,7 +47,7 @@
     <script>
 
 var map;
-var imgfile = null;
+var position ;
 
 function initialize() {
   var mapOptions = {
@@ -82,6 +82,7 @@ function initialize() {
   
   google.maps.event.addListener(map, 'rightclick', function(mouseEvent){
     contextMenu.show(mouseEvent.latLng);
+    position = mouseEvent.latLng;
   });
   google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
   switch(eventName){
@@ -106,7 +107,7 @@ function tweetImage() {
     imgfile = imgfile.substring(lastIndex + 1);
    }
   var msg = prompt("Enter your tweet status.");
-  alert("sending " + msg + " and imgfile " + imgfile);
+  alert("sending " + msg + " and imgfile " + imgfile + " from " + position);
   //ws.send
 }
 

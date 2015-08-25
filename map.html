@@ -47,6 +47,7 @@
     <script>
 
 var map;
+var imgfile = null;
 
 function initialize() {
   var mapOptions = {
@@ -89,25 +90,30 @@ function initialize() {
       bullTweet(latLng,msg);
       break;
     case 'bulltweet_image':
-      alertFilename();
+      //document.getElementById('upload').onchange = uploadOnChange;
+      var msg = prompt("Enter your tweet status.");
+      document.getElementById('upload').click();
+      document.getElementById('upload').onchange = uploadOnChange;
+      //var fn = document.getElementById('upload').click();
       //var msg = prompt("Enter your tweet status.");
+      
       //bullTweet(latLng,msg);
       break;
     }
   });
 
-  document.getElementById('upload').onchange = uploadOnChange;
+  //document.getElementById('upload').onchange = uploadOnChange;
 
 }
 
 function uploadOnChange() {
-  var filename = this.value;
-  var lastIndex = filename.lastIndexOf("\\");
+  imgfile = this.value;
+  alert(imgfile);
+  var lastIndex = imgfile.lastIndexOf("\\");
   if (lastIndex >= 0) {
-    filename = filename.substring(lastIndex + 1);
-  }
-  document.getElementById('filename').value = filename;
-  alert(filename);
+    imgfile = imgfile.substring(lastIndex + 1);
+   }
+  alert(imgfile);
 }
 
 function bullTweet(latLng,msg) {

@@ -2,12 +2,9 @@
 
 Here's how it's going to work:
 
-1. Open map.html in browser
-2. Right-click spot on map, select "Make Tweet".
-3. bulltwitter script creates a tweet geotagged with that location. Create an entire fake vacation narrative while you stay indoors and live on Cheetos for a week!
+1. Launch bulltwitter.rb, which creates a Twitter client process and monitors websockets.
+2. Open map.html in browser.
+3. Right-click spot on map, select "Tweet from here" or "Tweet + Image from here".
+4. bulltwitter script creates a tweet geotagged with that location. Create an entire fake vacation narrative while you stay indoors and live on Cheetos for a week!
 
-![toldya, baby steps](https://cloud.githubusercontent.com/assets/1410310/9306409/23accaaa-44c6-11e5-9598-66fdeea258b6.jpg)
-
-Future features:
-
-- ability to attach photos
+![bt](https://cloud.githubusercontent.com/assets/1410310/9476888/2a9a35f0-4b3d-11e5-8efe-45a7ae209e86.jpg)

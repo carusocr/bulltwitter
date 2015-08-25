@@ -47,7 +47,7 @@
     <script>
 
 var map;
-var imgfile = null;
+var position ;
 
 function initialize() {
   var mapOptions = {
@@ -82,22 +82,16 @@ function initialize() {
   
   google.maps.event.addListener(map, 'rightclick', function(mouseEvent){
     contextMenu.show(mouseEvent.latLng);
+    position = mouseEvent.latLng;
   });
   google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
   switch(eventName){
     case 'bulltweet':
-      var msg = prompt("Enter your tweet status.");
       bullTweet(latLng,msg);
       break;
     case 'bulltweet_image':
-      //document.getElementById('upload').onchange = uploadOnChange;
-      var msg = prompt("Enter your tweet status.");
       document.getElementById('upload').click();
-      document.getElementById('upload').onchange = uploadOnChange;
-      //var fn = document.getElementById('upload').click();
-      //var msg = prompt("Enter your tweet status.");
-      
-      //bullTweet(latLng,msg);
+      document.getElementById('upload').onchange = tweetImage;
       break;
     }
   });
@@ -106,17 +100,19 @@ function initialize() {
 
 }
 
-function uploadOnChange() {
+function tweetImage() {
   imgfile = this.value;
-  alert(imgfile);
   var lastIndex = imgfile.lastIndexOf("\\");
   if (lastIndex >= 0) {
     imgfile = imgfile.substring(lastIndex + 1);
    }
-  alert(imgfile);
+  var msg = prompt("Enter your tweet status.");
+  alert("sending " + msg + " and imgfile " + imgfile + " from " + position);
+  //ws.send
 }
 
 function bullTweet(latLng,msg) {
+  var msg = prompt("Enter your tweet status.");
   msgbody = latLng + msg;
   ws.send(msgbody);
 }
@@ -131,7 +127,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <div id="map-canvas"></div>
     <div id="panel">
     <button onclick="initialize()">Reset Map</button>
-    <input type="file" id="upload" />
+    <input type="file" id="upload" style="display: none;"/>
     </div>
   </body>
 </div>

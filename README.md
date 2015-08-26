@@ -1,6 +1,6 @@
 # bulltwitter
 
-Here's how it's going to work:
+Here's how it works:
 
 1. Launch bulltwitter.rb, which creates a Twitter client process and monitors websockets.
 2. Open map.html in browser.

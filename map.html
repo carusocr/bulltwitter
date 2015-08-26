@@ -87,7 +87,7 @@ function initialize() {
   google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
   switch(eventName){
     case 'bulltweet':
-      bullTweet(latLng,msg);
+      bullTweet();
       break;
     case 'bulltweet_image':
       document.getElementById('upload').click();
@@ -95,8 +95,6 @@ function initialize() {
       break;
     }
   });
-
-  //document.getElementById('upload').onchange = uploadOnChange;
 
 }
 
@@ -107,13 +105,12 @@ function tweetImage() {
     imgfile = imgfile.substring(lastIndex + 1);
    }
   var msg = prompt("Enter your tweet status.");
-  alert("sending " + msg + " and imgfile " + imgfile + " from " + position);
-  //ws.send
+  ws.send("IMG" + imgfile + position + msg);
 }
 
-function bullTweet(latLng,msg) {
+function bullTweet() {
   var msg = prompt("Enter your tweet status.");
-  msgbody = latLng + msg;
+  msgbody = position + msg;
   ws.send(msgbody);
 }
 

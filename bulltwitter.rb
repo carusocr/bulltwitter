@@ -44,10 +44,15 @@ EM.run {
     end
     ws.onmessage do |msg|
       # check for coords in parens + string
-      if msg =~ /\(-?\d{1,3}\.\d+, -?\d{1,3}\.\d+\)/
-        puts "got #{msg}\n"
+      if msg =~ /^(?!IMG)\(-?\d{1,3}\.\d+, -?\d{1,3}\.\d+\)/
+        puts "zug #{msg}\n"
         lat,lng,status = msg.match(/\((-?\d{1,3}\.\d+), (-?\d{1,3}\.\d+)\)(.+)$/).captures
         bulltweet(lat,lng,status)
+      elsif msg =~ /IMG/
+        puts "got #{msg}\n"
+        imgfile,lat,lng,status = msg.match(/IMG(.+)\((-?\d{1,3}\.\d+), (-?\d{1,3}\.\d+)\)(.+)$/).captures
+        puts "sending #{imgfile} and status #{status}\n"
+        bulltweet_with_image(lat,lng,status,imgfile) 
       else
         puts "Got unintelligible command, please resend."
       end

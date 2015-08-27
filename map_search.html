@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>BullTwitter</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0px;
+        padding: 0px
+      }
+      #panel {
+        position: absolute;
+        top: 5px;
+        left: 50%;
+        margin-left: -180px;
+        z-index: 5;
+        background-color: #fff;
+        padding: 5px;
+        border: 1px solid #999;
+      }
+      /*  start styles for the ContextMenu  */
+      .context_menu{
+        background-color:white;
+        border:1px solid gray;
+      }
+      .context_menu_item{
+        padding:3px 6px;
+      }
+      .context_menu_item:hover{
+        background-color:#CCCCCC;
+      }
+      .context_menu_separator{
+        background-color:gray;
+        height:1px;
+        margin:0;
+        padding:0;
+      }
+      #clearDirectionsItem, #getDirectionsItem{
+        display:none;
+      }
+      /*  end styles for the ContextMenu  */
+
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
+    <script type="text/javascript", src="ContextMenu.js"></script>
+    <script>
+
+var map;
+var position ;
+
+function initialize() {
+  var mapOptions = {
+    zoom: 14,
+    center: new google.maps.LatLng(39.9522222,-75.1641667),
+    mapTypeId: google.maps.MapTypeId.ROADMAP,
+    mapTypeControl: true,
+    mapTypeControlOptions: {
+      style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+      position: google.maps.ControlPosition.BOTTOM_CENTER
+    }
+  };
+
+  map = new google.maps.Map(document.getElementById('map-canvas'),
+    mapOptions);
+
+  ws = new WebSocket("ws://localhost:8567/");
+
+// new context menu to enable right-click option to make tweet from that point
+
+  var contextMenuOptions={};
+  contextMenuOptions.classNames={menu:'context_menu', menuSeparator:'context_menu_separator'};
+  
+  //  create an array of ContextMenuItem objects
+  //  an 'id' is defined for each of the four directions related items
+  var menuItems=[];
+  menuItems.push({className:'context_menu_item', eventName:'bulltweet', id:'directionsOriginItem', label:'Tweet from here'});
+  menuItems.push({className:'context_menu_item', eventName:'bulltweet_image', id:'directionsOriginItem', label:'Tweet+Image from here'});
+  contextMenuOptions.menuItems=menuItems;
+
+  var contextMenu=new ContextMenu(map, contextMenuOptions);
+  
+  google.maps.event.addListener(map, 'rightclick', function(mouseEvent){
+    contextMenu.show(mouseEvent.latLng);
+    position = mouseEvent.latLng;
+  });
+  google.maps.event.addListener(contextMenu, 'menu_item_selected', function(latLng, eventName){
+  switch(eventName){
+    case 'bulltweet':
+      bullTweet();
+      break;
+    case 'bulltweet_image':
+      document.getElementById('upload').click();
+      document.getElementById('upload').onchange = tweetImage;
+      break;
+    }
+  });
+
+  var input = document.getElementById('pac-input');
+  var searchBox = new google.maps.places.SearchBox(input);
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+  // Bias the SearchBox results towards current map's viewport.
+  map.addListener('bounds_changed', function() {
+    searchBox.setBounds(map.getBounds());
+  });
+
+var markers = [];
+  // [START region_getplaces]
+  // Listen for the event fired when the user selects a prediction and retrieve
+  // more details for that place.
+  searchBox.addListener('places_changed', function() {
+    var places = searchBox.getPlaces();
+
+    if (places.length == 0) {
+      return;
+    }
+
+    // Clear out the old markers.
+    markers.forEach(function(marker) {
+      marker.setMap(null);
+    });
+    markers = [];
+
+    // For each place, get the icon, name and location.
+    var bounds = new google.maps.LatLngBounds();
+    places.forEach(function(place) {
+      var icon = {
+        url: place.icon,
+        size: new google.maps.Size(71, 71),
+        origin: new google.maps.Point(0, 0),
+        anchor: new google.maps.Point(17, 34),
+        scaledSize: new google.maps.Size(25, 25)
+      };
+
+      // Create a marker for each place.
+      markers.push(new google.maps.Marker({
+        map: map,
+        icon: icon,
+        title: place.name,
+        position: place.geometry.location
+      }));
+
+      if (place.geometry.viewport) {
+        // Only geocodes have viewport.
+        bounds.union(place.geometry.viewport);
+      } else {
+        bounds.extend(place.geometry.location);
+      }
+    });
+    map.fitBounds(bounds);
+  });
+
+
+
+}
+
+function tweetImage() {
+  imgfile = this.value;
+  var lastIndex = imgfile.lastIndexOf("\\");
+  if (lastIndex >= 0) {
+    imgfile = imgfile.substring(lastIndex + 1);
+   }
+  var msg = prompt("Enter your tweet status.");
+  ws.send("IMG" + imgfile + position + msg);
+}
+
+function bullTweet() {
+  var msg = prompt("Enter your tweet status.");
+  msgbody = position + msg;
+  ws.send(msgbody);
+}
+
+google.maps.event.addDomListener(window, 'load', initialize);
+
+    </script>
+
+  </head>
+
+  <body>
+    <div id="map-canvas"></div>
+    <div id="panel">
+    <button onclick="initialize()">Reset Map</button>
+    <input id="pac-input" class="controls" type="text" placeholder="Search Location">
+    <input type="file" id="upload" style="display: none;"/>
+    </div>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete"
+         async defer></script>
+  </body>
+</div>
+</html>

@@ -42,7 +42,6 @@
       /*  end styles for the ContextMenu  */
 
     </style>
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
     <script type="text/javascript", src="ContextMenu.js"></script>
     <script>
@@ -105,9 +104,18 @@ function initialize() {
   map.addListener('bounds_changed', function() {
     searchBox.setBounds(map.getBounds());
   });
-1;6P
-1;4P
 
+  var markers = [];
+
+  searchBox.addListener('places_changed',function() {
+
+    var places = searchBox.getPlaces();
+
+    if (places.length == 0) {
+      return;
+    }
+
+  });
 
 
 }
@@ -141,6 +149,7 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <input id="pac-input" class="controls" type="text" placeholder="Search Location">
     <input type="file" id="upload" style="display: none;"/>
     </div>
+    <!--<script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete" async defer></script>-->
   </body>
 </div>
 </html>

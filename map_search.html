@@ -42,6 +42,7 @@
       /*  end styles for the ContextMenu  */
 
     </style>
+    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete"></script>
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=visualization"></script>
     <script type="text/javascript", src="ContextMenu.js"></script>
     <script>
@@ -184,8 +185,6 @@ google.maps.event.addDomListener(window, 'load', initialize);
     <input id="pac-input" class="controls" type="text" placeholder="Search Location">
     <input type="file" id="upload" style="display: none;"/>
     </div>
-    <script src="https://maps.googleapis.com/maps/api/js?libraries=places&callback=initAutocomplete"
-         async defer></script>
   </body>
 </div>
 </html>

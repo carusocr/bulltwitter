@@ -45,7 +45,6 @@ EM.run {
     ws.onmessage do |msg|
       # check for coords in parens + string
       if msg =~ /^(?!IMG)\(-?\d{1,3}\.\d+, -?\d{1,3}\.\d+\)/
-        puts "zug #{msg}\n"
         lat,lng,status = msg.match(/\((-?\d{1,3}\.\d+), (-?\d{1,3}\.\d+)\)(.+)$/).captures
         bulltweet(lat,lng,status)
       elsif msg =~ /IMG/
